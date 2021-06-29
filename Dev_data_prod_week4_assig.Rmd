@@ -1,0 +1,81 @@
+---
+title: "Select a car based on Horse power and miles per gallon!"
+author: "Gianluca Kikidis"
+date: "29.06.2021"
+output:
+  slidy_presentation: default
+  html_document:
+    number_sections: yes
+    toc: yes
+  ioslides_presentation: default
+mode: selfcontained
+job: Reproducible Pitch Presentation
+highlighter: highlight.js
+widgets: bootstrap
+---
+
+## Reproducible Pitch
+
+I created a Shiny application in order to select cars from the mtcars data set in R
+based on their Horse Powers. With this application, a plot is shown in which you can
+see the miles per gallon a car makes with a specific horsepower.
+
+
+```{r, echo = FALSE, eval = TRUE}
+library(ggplot2)
+library(shinycustomloader)
+library(shiny)
+```
+
+## shinyUI part
+
+In this part i create the structure of the app, including what has to be displayed etc.
+
+```{r, echo = TRUE, eval = FALSE}
+shinyUI(fluidPage(
+    titlePanel("Car selection based on horsepower and miles per gallon using Shiny and ggplot"),
+    sidebarLayout(
+        sidebarPanel(
+            checkboxInput("show_xlab", "Show/Hide X Axis Label", TRUE),
+            checkboxInput("show_ylab", "Show/Hide Y Axis Label", TRUE),
+            sliderInput("hp","Select minimum Horse Power",52,335,52)
+        ),
+        mainPanel(
+            h3("Select a car based on horse power and miles per gallon"),
+                plotOutput("plot1") )
+            )
+)
+)
+```
+
+## Then i create the shinyServer part, including codes and comands for the app:
+
+```{r, echo = TRUE, eval = FALSE}
+shinyServer(function(input, output) {
+    filtered_data <- reactive({
+        sub <- subset(
+            mtcars,
+            hp >= input$hp[1]
+        )
+        sub
+    })
+    output$plot1 <- renderPlot({
+        sub <- filtered_data()
+        xlab <- ifelse(input$show_xlab, "Horse Power", "")
+        ylab <- ifelse(input$show_xlab, "Miles Per Gallon", "")
+ggplot(sub, aes_string(y = sub$mpg, x= sub$hp)) +
+            labs(x = xlab, y = ylab) +
+                geom_point(size = sub$wt) +
+                ggtitle("Thicker points equal heavier cars, while thinner points equal lighter cars")
+        })
+    })
+```
+
+## Discussion
+
+And this is how i created my first little app. It might not be too interesting, but
+i am still glad i made it and also i had to limit myself a bit because of my computer
+not working very well. 
+
+
+Thank you :)
